@@ -9,9 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@rainbow-me/rainbowkit": "latest",
+    "@tanstack/react-query": "^5.59.16",
+    "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.0.4"
+    "viem": "2.x",
+    "wagmi": "^2.12.25"
   },
   "devDependencies": {
     "typescript": "^5",
