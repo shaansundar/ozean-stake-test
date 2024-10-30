@@ -21,7 +21,7 @@ export const ModifiedDropdown = ({
           <Image
             priority
             src={`/${type}/${
-              selectedValue
+              selectedValue?.toLowerCase()
                 ? selectedValue?.toLowerCase()
                 : type === "Networks"
                 ? "Ethereum"
@@ -56,7 +56,7 @@ export const ModifiedDropdown = ({
             <Image
               priority
               src={`/${type}/${
-                value
+                value?.toLowerCase()
                   ? value?.toLowerCase()
                   : type === "Networks"
                   ? "Ethereum"
