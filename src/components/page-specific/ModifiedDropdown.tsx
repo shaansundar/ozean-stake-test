@@ -21,11 +21,11 @@ export const ModifiedDropdown = ({
           <Image
             priority
             src={`/${type}/${
-              selectedValue?.toLowerCase()
+              selectedValue
                 ? selectedValue?.toLowerCase()
                 : type === "Networks"
-                ? "Ethereum"
-                : "ETH"
+                ? "ethereum"
+                : "eth"
             }.svg`}
             alt={selectedValue || "Ethereum"}
             width={32}
@@ -56,11 +56,11 @@ export const ModifiedDropdown = ({
             <Image
               priority
               src={`/${type}/${
-                value?.toLowerCase()
+                value
                   ? value?.toLowerCase()
                   : type === "Networks"
-                  ? "Ethereum"
-                  : "ETH"
+                  ? "ethereum"
+                  : "eth"
               }.svg`}
               alt={value}
               width={28}

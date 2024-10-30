@@ -185,7 +185,7 @@ const Bridge = () => {
             <div className="outline-none select-none w-52 h-10 bg-white border border-primaryGrey rounded-full flex items-center justify-between p-1">
               <Image
                 priority
-                src={`/Tokens/USDX.svg`}
+                src={`/Tokens/usdx.svg`}
                 alt={"USDX"}
                 width={32}
                 height={32}
