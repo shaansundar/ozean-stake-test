@@ -92,7 +92,7 @@ const Bridge = () => {
             placeholder="7.445"
             // style={{ "field-sizing": "content" }}
             className={clsx(
-              "bg-transparent leading-[80px] placeholder:opacity-25 placeholder:text-primaryGrey text-center w-auto max-w-[740px] border-b-[6px] text-[80px] font-bold outline-none focus:outline-none border-primaryGrey",
+              "bg-transparent leading-[80px] placeholder:opacity-25 placeholder:text-primaryGrey text-center w-auto max-w-[740px] border-b-[6px] text-[80px] font-bold outline-none focus:outline-none focus:border-primaryBlue border-primaryGrey",
               state.network &&
                 `focus:border-${state.network.toLowerCase()} text-${state.network.toLowerCase()}Theme`
             )}
