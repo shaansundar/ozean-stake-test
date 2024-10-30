@@ -198,8 +198,8 @@ const Bridge = () => {
           <h1 className="text-center text-4xl text-secondaryBlue font-semibold">
             You Get
           </h1>
-          <div className="flex flex-col items-center gap-8 justify-center h-full">
-            <h1 className="text-center truncate -mt-[240px] text-[98px] text-wrap text-primaryBlue font-bold">{`$${(
+          <div className="flex flex-col items-center gap-8 justify-center h-full w-full">
+            <h1 className="text-center truncate max-w-[80%] -mt-[240px] text-[98px] text-wrap text-primaryBlue font-bold">{`$${(
               ((inputNumber + 0.012 + 0.004) * 5.22) / 0.004 -
               0.65
             ).toFixed(3)}`}</h1>
