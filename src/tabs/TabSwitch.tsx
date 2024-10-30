@@ -1,8 +1,8 @@
 import { useTab } from "@/state/TabProvider";
 import { useEffect, useState } from "react";
-import Bridge from "./Bridge";
 import Stake from "./Stake";
 import Explore from "./Explore";
+import Bridge from "./Bridge";
 
 type Props = {};
 

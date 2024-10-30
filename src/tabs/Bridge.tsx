@@ -1,144 +1,122 @@
-import { Dropdown, DropdownItem } from "@/components/Dropdown";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { PiCaretDown, PiBridge } from "react-icons/pi";
+import { PiBridge, PiWallet } from "react-icons/pi";
 import clsx from "clsx";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ToggleGroup";
-import { useChainId, useSwitchChain } from "wagmi";
+import { ToggleGroup, ToggleGroupItem } from "@/components/shared/ToggleGroup";
+import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { formatEther } from "viem";
+import { ModifiedDropdown } from "@/components/page-specific/ModifiedDropdown";
 
-const tokens = ["ETH", "ARB", "OP", "POL"];
+
+const FEES = {
+  GAS: 0.004,
+  BRIDGE: 0.012,
+  USD_RATE: 2750,
+  MIN_AMOUNT: 0.001,
+} as const;
+
 
 const Bridge = () => {
+  // WAGMI hooks
   const { switchChain, chains } = useSwitchChain();
   const chainId = useChainId();
+  const { isConnected, address } = useAccount();
+  const { data: balanceData } = useBalance({ address });
+  const { openConnectModal } = useConnectModal();
+
+  // Constants
+  const tokens = ["ETH", "ARB", "OP", "POL"];
   const networks = chains.map((chain) => chain.name.split(" ")[0]);
-  const [selectedNetwork, setSelectedNetwork] = useState(chains.find((chain) => chain.id === chainId)?.name.split(" ")[0]);
-  const [selectedToken, setSelectedToken] = useState(tokens[0]);
-  const [inputNumber, setInputNumber] = useState(0);
-  const [selectedPercentage, setSelectedPercentage] = useState(1);
-  
+
+  // States
+  const [state, setState] = useState<{
+    network: string | undefined;
+    token: string;
+    percentage: number;
+    hydrated: boolean;
+  }>({
+    network: chains.find((chain) => chain.id === chainId)?.name.split(" ")[0],
+    token: tokens[0],
+    percentage: 1,
+    hydrated: false,
+  });
+
+  const balance = balanceData?.value
+    ? Number(parseFloat(formatEther(balanceData.value)).toFixed(4))
+    : 0;
+  const [inputNumber, setInputNumber] = useState(balance);
+
+  // Effects
   useEffect(() => {
-    const chainId = chains.find((chain) => chain.name.split(" ")[0] === selectedNetwork)?.id;
+    setState((prev) => ({ ...prev, hydrated: true }));
+  }, []);
+
+  useEffect(() => {
+    setInputNumber(balance * state.percentage);
+  }, [state.percentage, balance]);
+
+  useEffect(() => {
+    const chainId = chains.find(
+      (chain) => chain.name.split(" ")[0] === state.network
+    )?.id;
     if (chainId) {
-      switchChain?.({chainId});
+      switchChain?.({ chainId });
+      setState((prev) => ({
+        ...prev,
+        token: (chainId === 137 ? "POL" : "ETH") as string,
+      }));
     }
-  }, [selectedNetwork, chains, switchChain]);
+  }, [state.network, chains, switchChain]);
 
-  useEffect(() => {
-    setInputNumber(7.445 * selectedPercentage);
-  }, [selectedPercentage]);
+  const totalAmount = inputNumber + FEES.BRIDGE + FEES.GAS;
+  const usdValue = (amount: number) => (amount * FEES.USD_RATE).toFixed(3);
 
-  return (
+  return state.hydrated ? (
     <div className="w-full h-full flex flex-col gap-4">
       <div className="w-full h-full flex items-center gap-4">
         <div className="w-1/2 h-full rounded-tl-[32px] bg-cardGrey flex gap-4 flex-col items-center justify-start pt-8">
           <div className="w-full flex h-16 items-center justify-center">
-            <Dropdown
-              trigger={
-                <button className="outline-none font-semibold select-none w-52 h-10 bg-white rounded-full flex items-center justify-between p-1">
-                  <Image
-                    priority
-                    src={`/Networks/${(selectedNetwork || "Ethereum").toLowerCase()}.svg`}
-                    alt={selectedNetwork || "Ethereum"}
-                    width={32}
-                    height={32}
-                  />
-                  <div
-                    className={clsx(
-                      "text-sm font-semibold",
-                      `text-${(selectedNetwork || "Ethereum").toLowerCase()}Theme`
-                    )}
-                  >
-                    {selectedNetwork || "Ethereum"}
-                  </div>
-                  <PiCaretDown className="size-4 mr-2" />
-                </button>
-              }
-            >
-              {networks.map((network, index) => (
-                <DropdownItem
-                  className={clsx(
-                    `hover:bg-primaryBlue flex w-52 items-center justify-between font-semibold hover:text-white text-${network.toLowerCase()}Theme bg-white text-sm`
-                  )}
-                  onSelect={() => setSelectedNetwork(network)}
-                  key={index}
-                >
-                  <h1>{network}</h1>
-                  <div className="size-8 rounded-full flex items-center justify-center bg-white">
-                    <Image
-                      priority
-                      src={`/Networks/${network.toLowerCase()}.svg`}
-                      alt={network}
-                      width={28}
-                      height={28}
-                    />
-                  </div>
-                </DropdownItem>
-              ))}
-            </Dropdown>
+            <ModifiedDropdown
+              selectedValue={state.network}
+              setSelectedValue={(network) => {
+                setState((prev) => ({ ...prev, network }));
+              }}
+              values={networks}
+              type="Networks"
+            />
           </div>
-          <h3 className="text-xs text-black">Wallet Balance: 7.445 ETH</h3>
+          <h3 className="text-xs text-black">
+            Wallet Balance: {balance} {state.token}
+          </h3>
           <input
             autoFocus
             placeholder="7.445"
             style={{ "field-sizing": "content" }}
             className={clsx(
-              "bg-transparent leading-[98px] placeholder:opacity-25 placeholder:text-primaryGrey text-center max-w-[740px] w-fit min-w-80 border-b-[6px] text-[98px] font-bold outline-none focus:outline-none border-primaryGrey",
-              selectedNetwork && `focus:border-${selectedNetwork.toLowerCase()} text-${selectedNetwork.toLowerCase()}Theme`
+              "bg-transparent leading-[80px] placeholder:opacity-25 placeholder:text-primaryGrey text-center max-w-[740px] w-fit min-w-80 border-b-[6px] text-[80px] font-bold outline-none focus:outline-none border-primaryGrey",
+              state.network &&
+                `focus:border-${state.network.toLowerCase()} text-${state.network.toLowerCase()}Theme`
             )}
             value={inputNumber}
             onChange={(e) => setInputNumber(Number(e.target.value))}
             type="number"
           />
           <div className="w-full flex h-fit mt-4 items-center justify-center">
-            <Dropdown
-              className="items-center"
-              trigger={
-                <button className="outline-none select-none w-40 h-10 bg-white rounded-full flex items-center justify-between p-1">
-                  <Image
-                    priority
-                    src={`/Tokens/${selectedToken.toLowerCase()}.svg`}
-                    alt={selectedToken}
-                    width={32}
-                    height={32}
-                  />
-                  <div
-                    className={clsx(
-                      "text-sm font-semibold",
-                      `text-${selectedToken.toLowerCase()}`
-                    )}
-                  >
-                    {selectedToken}
-                  </div>
-                  <PiCaretDown className="size-4 mr-2" />
-                </button>
-              }
-            >
-              {tokens.map((token, index) => (
-                <DropdownItem
-                  className={clsx(
-                    `hover:bg-primaryBlue flex items-center w-40 justify-between hover:text-white text-${token.toLowerCase()} bg-white text-sm`
-                  )}
-                  onSelect={() => setSelectedToken(token)}
-                  key={index}
-                >
-                  <h1>{token}</h1>
-                  <div className="size-8 rounded-full flex items-center justify-center bg-white">
-                    <Image
-                      priority
-                      src={`/Tokens/${token.toLowerCase()}.svg`}
-                      alt={token}
-                      width={28}
-                      height={28}
-                    />
-                  </div>
-                </DropdownItem>
-              ))}
-            </Dropdown>
+            <ModifiedDropdown
+              selectedValue={state.token}
+              setSelectedValue={(token) => {
+                setState((prev) => ({ ...prev, token }));
+              }}
+              values={tokens}
+              type="Tokens"
+            />
           </div>
           <ToggleGroup
-            selected={selectedPercentage}
-            setSelected={(value) => setSelectedPercentage(Number(value))}
+            selected={state.percentage}
+            setSelected={(value) =>
+              setState((prev) => ({ ...prev, percentage: Number(value) }))
+            }
             className="mt-2"
           >
             <ToggleGroupItem
@@ -171,24 +149,23 @@ const Bridge = () => {
               <tbody className="flex flex-col gap-2 w-full">
                 <tr className="py-4 h-fit flex items-center justify-between">
                   <td className="text-start h-fit w-1/2">Gas Fee</td>
-                  <td className="text-end w-1/2">{`0.004 ${selectedToken} (~$5.22)`}</td>
+                  <td className="text-end w-1/2">{`${FEES.GAS} ${
+                    state.token
+                  } (~$${usdValue(FEES.GAS)})`}</td>
                 </tr>
                 <tr className="py-4 h-fit flex items-center justify-between">
                   <td className="text-start h-fit w-1/2">Bridge Fee</td>
-                  <td className="text-end w-1/2">{`0.012 ${selectedToken} (~$15.66)`}</td>
+                  <td className="text-end w-1/2">{`${FEES.BRIDGE} ${
+                    state.token
+                  } (~$${usdValue(FEES.BRIDGE)})`}</td>
                 </tr>
                 <tr className="py-4 h-fit flex items-center justify-between">
                   <td className="text-start h-fit w-1/2">
                     Total Transfer Amount
                   </td>
-                  <td className="text-end font-bold w-1/2">{`${(
-                    inputNumber +
-                    0.012 +
-                    0.004
-                  ).toFixed(5)} ${selectedToken} (~$${(
-                    ((inputNumber + 0.012 + 0.004) * 5.22) /
-                    0.004
-                  ).toFixed(3)}) `}</td>
+                  <td className="text-end font-bold w-1/2">{`${totalAmount} ${
+                    state.token
+                  } (~$${usdValue(totalAmount)})`}</td>
                 </tr>
               </tbody>
             </table>
@@ -199,9 +176,9 @@ const Bridge = () => {
             You Get
           </h1>
           <div className="flex flex-col items-center gap-8 justify-center h-full w-full">
-            <h1 className="text-center truncate max-w-[80%] -mt-[240px] text-[98px] text-wrap text-primaryBlue font-bold">{`$${(
-              ((inputNumber + 0.012 + 0.004) * 5.22) / 0.004 -
-              0.65
+            <h1 className="text-center truncate max-w-[80%] -mt-[240px] text-[80px] text-wrap text-primaryBlue font-bold">{`$${(
+              totalAmount * FEES.USD_RATE -
+              2.65
             ).toFixed(3)}`}</h1>
             <div className="outline-none select-none w-52 h-10 bg-white border border-primaryGrey rounded-full flex items-center justify-between p-1">
               <Image
@@ -223,13 +200,42 @@ const Bridge = () => {
           </h1>
         </div>
       </div>
-      <button
-        disabled={inputNumber === 0}
-        className="bg-primaryBlue transition-colors text-xl font-bold hover:bg-primaryBlue/80 disabled:bg-gray-400 text-white disabled:text-black rounded-b-[32px] h-20 w-full flex items-center justify-center"
-      >
-        <PiBridge className="size-7 mr-2" />
-        Bridge
-      </button>
+      {!isConnected ? (
+        <button
+          onClick={() => {
+            openConnectModal?.();
+          }}
+          className="bg-primaryBlue transition-colors text-xl font-bold hover:bg-primaryBlue/80 disabled:bg-gray-400 text-white disabled:text-black rounded-b-[32px] h-20 w-full flex items-center justify-center"
+        >
+          <PiWallet className="size-7 mr-2" />
+          Connect Wallet to Bridge
+        </button>
+      ) : (
+        <button
+          disabled={inputNumber < 0.001}
+          onClick={() => {
+            if (!isConnected) {
+              openConnectModal?.();
+            } else {
+              alert("Mock Bridge Successful");
+            }
+          }}
+          className="bg-primaryBlue transition-colors text-xl font-bold hover:bg-primaryBlue/80 disabled:bg-gray-400 text-white disabled:text-black rounded-b-[32px] h-20 w-full flex items-center justify-center"
+        >
+          {isConnected && inputNumber > 0.001 && (
+            <PiBridge className="size-7 mr-2" />
+          )}
+          {!isConnected
+            ? "Connect Wallet to Bridge"
+            : inputNumber < 0.001
+            ? "Enter Amount > 0.001"
+            : "Bridge"}
+        </button>
+      )}
+    </div>
+  ) : (
+    <div className="w-full h-full flex items-center justify-center">
+      <h1>Loading...</h1>
     </div>
   );
 };

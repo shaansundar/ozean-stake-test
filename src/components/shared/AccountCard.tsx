@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAccount, useDisconnect } from "wagmi";
 import clsx from "clsx";
 import { PiUserCircleFill } from "react-icons/pi";
@@ -9,7 +9,11 @@ const AccountCard = () => {
   const { openConnectModal } = useConnectModal();
   const { openAccountModal } = useAccountModal();
   const { disconnect } = useDisconnect();
-  return (
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated ? (
     <button
       onClick={() => {
         address ? openAccountModal?.() : openConnectModal?.();
@@ -24,7 +28,7 @@ const AccountCard = () => {
         ? address.slice(0, 6) + "..." + address.slice(-4)
         : "Disconnected"}
     </button>
-  );
+  ) : null;
 };
 
 export default AccountCard;

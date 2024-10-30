@@ -41,7 +41,6 @@ const NavigationIsland = () => {
   const [itemsState, setItemsState] = useState<ItemType[]>(items);
   const { tab, toggleTab } = useTab();
   const { isConnected } = useAccount();
-  // const { connect } = useConnect()
   const { disconnect } = useDisconnect();
   const [hydrated, setHydrated] = useState(false);
 

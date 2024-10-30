@@ -1,5 +1,5 @@
 "use client";
-import NavigationIsland from "@/components/NavigationIsland";
+import NavigationIsland from "@/components/shared/NavigationIsland";
 import Image from "next/image";
 import { TabProvider } from "@/state/TabProvider";
 import TabSwitch from "@/tabs/TabSwitch";
@@ -7,7 +7,7 @@ import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { config } from "@/config/wagmiConfig";
-import AccountCard from "@/components/AccountCard";
+import AccountCard from "@/components/shared/AccountCard";
 
 
 export default function Home() {

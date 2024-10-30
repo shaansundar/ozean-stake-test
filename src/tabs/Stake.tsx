@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ToggleGroup";
+import { ToggleGroup, ToggleGroupItem } from "@/components/shared/ToggleGroup";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { PiPiggyBank } from "react-icons/pi";
 import clsx from "clsx";
