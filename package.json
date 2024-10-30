@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@rainbow-me/rainbowkit": "latest",
     "@tanstack/react-query": "^5.59.16",

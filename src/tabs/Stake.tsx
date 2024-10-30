@@ -1,7 +1,9 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/shared/ToggleGroup";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { PiPiggyBank } from "react-icons/pi";
 import clsx from "clsx";
+import { useAccount, useBalance } from "wagmi";
+import { formatEther } from "viem";
 
 const poolData = [
   {
@@ -31,9 +33,22 @@ const poolData = [
 ];
 
 const Stake = () => {
-  const [inputNumber, setInputNumber] = useState(0);
-  const [selectedPercentage, setSelectedPercentage] = useState(1);
-  const [mode, setMode] = useState<"stake" | "unstake">("stake");
+  // States & Constants
+  const [state, setState] = useState<{
+    percentage: number;
+    mode: "stake" | "unstake";
+  }>({
+    percentage: 1,
+    mode: "stake",
+  });
+  const balance = state.mode === "stake" ? 5223 : 11382.11;
+  const [inputNumber, setInputNumber] = useState(balance);
+
+  // Effects
+  useEffect(() => {
+    setInputNumber(balance * state.percentage);
+  }, [state.percentage, balance]);
+
   return (
     <div className="w-full h-full bg-backgroundGrey rounded-[32px] p-4 flex items-center justify-center">
       <div className="w-1/2 h-full p-4 pr-12 flex flex-col items-start justify-start">
@@ -52,7 +67,10 @@ const Stake = () => {
         </p>
         <div className="w-full grid grid-cols-3 gap-4 mt-8">
           {poolData.map((item) => (
-            <div key={item.name} className="rounded-xl bg-white p-4 min-h-[140px] flex flex-col items-center justify-center gap-4">
+            <div
+              key={item.name}
+              className="rounded-xl bg-white p-4 min-h-[140px] flex flex-col items-center justify-center gap-4"
+            >
               <p className="text-secondaryBlue text-sm font-bold">
                 {item.name}
               </p>
@@ -76,16 +94,20 @@ const Stake = () => {
         <div className="flex flex-col gap-4 items-center w-full h-full">
           <ToggleGroup
             className="w-60 flex items-center justify-between rounded-full h-14 bg-black p-1"
-            selected={mode}
+            selected={state.mode}
             setSelected={(value: string | number) => {
-              console.log(value);
-              setMode(value as "stake" | "unstake");
+              setState((prev) => ({
+                ...prev,
+                mode: value as "stake" | "unstake",
+              }));
             }}
           >
             <ToggleGroupItem
               className={clsx(
                 "transition-all w-full h-full rounded-full",
-                mode === "stake" ? "bg-primaryBlue text-white" : " text-white"
+                state.mode === "stake"
+                  ? "bg-primaryBlue text-white"
+                  : " text-white"
               )}
               value="stake"
             >
@@ -94,18 +116,21 @@ const Stake = () => {
             <ToggleGroupItem
               className={clsx(
                 "transition-all w-full h-full rounded-full",
-                mode === "unstake" ? "bg-primaryBlue text-white" : " text-white"
+                state.mode === "unstake"
+                  ? "bg-primaryBlue text-white"
+                  : " text-white"
               )}
               value="unstake"
             >
               Unstake
             </ToggleGroupItem>
           </ToggleGroup>
-          <h3 className="text-xs text-black">Wallet Balance: 7.445 ETH</h3>
+          <h3 className="text-xs text-black">Wallet Balance: {balance} USDX</h3>
           <input
             placeholder="7.445"
             autoFocus
-            style={{ "field-sizing": "content" }}
+            // style={{ "field-sizing": "content" }}
+            style={{ width: `${inputNumber.toString().length}ch` }}
             className={clsx(
               "bg-transparent leading-[98px] placeholder:opacity-25 placeholder:text-primaryGrey text-center max-w-[740px] w-fit min-w-80 border-b-[6px] text-[98px] font-bold outline-none focus:outline-none border-primaryGrey",
               `focus:border-primaryBlue text-primaryBlue`
@@ -115,8 +140,13 @@ const Stake = () => {
             type="number"
           />
           <ToggleGroup
-            selected={selectedPercentage}
-            setSelected={setSelectedPercentage}
+            selected={state.percentage}
+            setSelected={(value: string | number) => {
+              setState((prev) => ({
+                ...prev,
+                percentage: Number(value),
+              }));
+            }}
             className="mt-2"
           >
             <ToggleGroupItem
@@ -176,7 +206,7 @@ const Stake = () => {
           className="bg-primaryBlue transition-colors text-xl font-bold hover:bg-primaryBlue/80 disabled:bg-gray-400 text-white disabled:text-black rounded-b-[32px] h-20 w-full flex items-center justify-center"
         >
           <PiPiggyBank className="size-7 mr-2" />
-          {mode === "stake" ? "Stake" : "Unstake"}
+          {state.mode === "stake" ? "Stake" : "Unstake"}
         </button>
       </div>
     </div>

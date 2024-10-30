@@ -8,14 +8,12 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatEther } from "viem";
 import { ModifiedDropdown } from "@/components/page-specific/ModifiedDropdown";
 
-
 const FEES = {
   GAS: 0.004,
   BRIDGE: 0.012,
   USD_RATE: 2750,
   MIN_AMOUNT: 0.001,
 } as const;
-
 
 const Bridge = () => {
   // WAGMI hooks
@@ -92,15 +90,19 @@ const Bridge = () => {
           <input
             autoFocus
             placeholder="7.445"
-            style={{ "field-sizing": "content" }}
+            // style={{ "field-sizing": "content" }}
             className={clsx(
-              "bg-transparent leading-[80px] placeholder:opacity-25 placeholder:text-primaryGrey text-center max-w-[740px] w-fit min-w-80 border-b-[6px] text-[80px] font-bold outline-none focus:outline-none border-primaryGrey",
+              "bg-transparent leading-[80px] placeholder:opacity-25 placeholder:text-primaryGrey text-center w-auto max-w-[740px] border-b-[6px] text-[80px] font-bold outline-none focus:outline-none border-primaryGrey",
               state.network &&
                 `focus:border-${state.network.toLowerCase()} text-${state.network.toLowerCase()}Theme`
             )}
             value={inputNumber}
             onChange={(e) => setInputNumber(Number(e.target.value))}
             type="number"
+            style={{
+              width: `${inputNumber.toString().length+1}ch`,
+              minWidth: "200px",
+            }}
           />
           <div className="w-full flex h-fit mt-4 items-center justify-center">
             <ModifiedDropdown
