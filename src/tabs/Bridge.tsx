@@ -1,5 +1,5 @@
 import { Dropdown, DropdownItem } from "@/components/Dropdown";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { PiCaretDown, PiBridge } from "react-icons/pi";
 import clsx from "clsx";
@@ -19,9 +19,6 @@ const Bridge = () => {
   
   useEffect(() => {
     const chainId = chains.find((chain) => chain.name.split(" ")[0] === selectedNetwork)?.id;
-
-    console.log("🚀 ~ useEffect ~ chainId:", chainId);
-
     if (chainId) {
       switchChain?.({chainId});
     }

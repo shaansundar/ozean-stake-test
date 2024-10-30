@@ -1,10 +1,9 @@
 "use client";
 import NavigationIsland from "@/components/NavigationIsland";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { TabProvider, useTab } from "@/state/TabProvider";
+import { TabProvider } from "@/state/TabProvider";
 import TabSwitch from "@/tabs/TabSwitch";
-import { useAccount, WagmiProvider } from "wagmi";
+import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { config } from "@/config/wagmiConfig";
@@ -12,8 +11,6 @@ import AccountCard from "@/components/AccountCard";
 
 
 export default function Home() {
-  const path = usePathname().split("/").reverse()[0];
-  // const { isConnected, address } = useAccount();
   const queryClient = new QueryClient();
 
   return (

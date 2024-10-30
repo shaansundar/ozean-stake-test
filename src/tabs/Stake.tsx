@@ -52,7 +52,7 @@ const Stake = () => {
         </p>
         <div className="w-full grid grid-cols-3 gap-4 mt-8">
           {poolData.map((item) => (
-            <div className="rounded-xl bg-white p-4 min-h-[140px] flex flex-col items-center justify-center gap-4">
+            <div key={item.name} className="rounded-xl bg-white p-4 min-h-[140px] flex flex-col items-center justify-center gap-4">
               <p className="text-secondaryBlue text-sm font-bold">
                 {item.name}
               </p>

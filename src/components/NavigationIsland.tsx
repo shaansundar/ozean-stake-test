@@ -59,7 +59,7 @@ const NavigationIsland = () => {
       {itemsState.map(({ itemName, ItemIcon, isWallet }, index) => {
         if (isWallet) {
           return (
-            <ConnectButton.Custom>
+            <ConnectButton.Custom key={index}>
               {({
                 account,
                 chain,
@@ -69,7 +69,6 @@ const NavigationIsland = () => {
               }) => {
                 return (
                   <button
-                    key={index}
                     onClick={() =>
                       isConnected ? disconnect() : openConnectModal()
                     }
