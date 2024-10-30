@@ -100,7 +100,7 @@ const Bridge = () => {
             onChange={(e) => setInputNumber(Number(e.target.value))}
             type="number"
             style={{
-              width: `${inputNumber.toString().length+1}ch`,
+              width: `${inputNumber.toString().length + 1}ch`,
               minWidth: "200px",
             }}
           />
@@ -178,10 +178,15 @@ const Bridge = () => {
             You Get
           </h1>
           <div className="flex flex-col items-center gap-8 justify-center h-full w-full">
-            <h1 className="text-center truncate max-w-[80%] -mt-[240px] text-[80px] text-wrap text-primaryBlue font-bold">{`$${(
-              totalAmount * FEES.USD_RATE -
-              2.65
-            ).toFixed(3)}`}</h1>
+            <h1 className="text-center truncate max-w-[80%] -mt-[240px] text-[80px] text-wrap text-primaryBlue font-bold">
+              {`$${
+                inputNumber > 0.001
+                  ? totalAmount * FEES.USD_RATE - 2.65 > 0
+                    ? (totalAmount * FEES.USD_RATE - 2.65).toFixed(3)
+                    : 0
+                  : 0
+              }`}
+            </h1>
             <div className="outline-none select-none w-52 h-10 bg-white border border-primaryGrey rounded-full flex items-center justify-between p-1">
               <Image
                 priority
